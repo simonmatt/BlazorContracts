@@ -1,0 +1,41 @@
+﻿@page "/contract/{Id:int}"
+@inject BlazorContracts.Web.Services.ApiService apiService
+@using BlazorContracts.Shared.Models
+
+<h3>Contract @Id.ToString()</h3>
+
+@if (contract == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-8 text-right">
+            <a href="/contract/@Id/edit" class="btn btn-sm btn-secondary">Edit</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>@contract.Name</h4>
+            <h4>@contract.PhoneNumber</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <a href="/">Return to list</a>
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private Contract contract;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contract = await apiService.GetContractByIdAsync(Id);
+    }
+}

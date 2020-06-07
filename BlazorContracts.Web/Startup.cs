@@ -1,4 +1,5 @@
 using BlazorContracts.Web.Services;
+using Blazored.SessionStorage;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +27,7 @@ namespace BlazorContracts.Web
             {
                 options.Client.Clients.Add("web", new ClientCredentialsTokenRequest
                 {
-                    Address = "http://localhost:5003/connect/token",
+                    Address = "http://localhost:5100/connect/token",
                     ClientId = "blazorcontracts-web",
                     ClientSecret = "secret",
                     Scope = "blazorcontracts-api"
@@ -35,9 +36,11 @@ namespace BlazorContracts.Web
 
             services.AddHttpClient<ApiService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5001");
+                client.BaseAddress = new Uri("http://localhost:5101");
             })
                 .AddClientAccessTokenHandler("web");
+
+            services.AddBlazoredSessionStorage();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();

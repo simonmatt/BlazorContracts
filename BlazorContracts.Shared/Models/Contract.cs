@@ -6,13 +6,15 @@ namespace BlazorContracts.Shared.Models
     public class Contract
     {
         [Key]
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
+        //[JsonPropertyName("id")]
+        public int Id { get; set; }
 
-        [Required, JsonPropertyName("name")]
+        [Required]
+        //[Required, JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [Required, Display(Name = "Phone Number"), JsonPropertyName("phonenumber")]
+        [Required]
+        //[Required, Display(Name = "Phone Number"), JsonPropertyName("phonenumber")]
         public string PhoneNumber { get; set; }
     }
 }

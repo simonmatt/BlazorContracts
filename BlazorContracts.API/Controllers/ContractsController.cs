@@ -1,66 +1,125 @@
-﻿using BlazorContracts.Shared.Models;
+﻿using BlazorContracts.API.Data;
+using BlazorContracts.Shared.Models;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BlazorContracts.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    //[Route("api/[controller]")]
+    //[ApiController]
     [Authorize]
-    public class ContractsController : ControllerBase
+    [ODataRoutePrefix("contracts")]
+    public class ContractsController : ODataController
     {
-        private static readonly List<Contract> contracts = GenerateContracts(10);
+        private readonly ContractsDbContext _context;
 
-        private static List<Contract> GenerateContracts(int number)
+        public ContractsController(ContractsDbContext context)
         {
-            return Enumerable.Range(1, number).Select(index => new Contract
-            {
-                Id = index,
-                Name = $"First{index} Last{index}",
-                PhoneNumber = $"+1 555 987{index}",
-            }).ToList();
+            _context = context;
         }
 
-        [HttpGet]
-        public ActionResult<List<Contract>> GetAllContracts()
+        [EnableQuery(PageSize = 50)]
+        [ODataRoute]
+        public IQueryable<Contract> Get()
         {
-            return contracts;
+            return _context.Contracts;
         }
 
         // GET: /api/contracts/4
-        [HttpGet("{id}")]
-        public ActionResult<Contract> GetContractById(int id)
+        // [HttpGet("{id}")]
+        [EnableQuery]
+        [ODataRoute("({id})")]
+        public async Task<IActionResult> GetContract([FromODataUri] int id)
         {
-            var contract = contracts.FirstOrDefault(s => s.Id == id);
-            if (contract == null) return NotFound();
-            return contract;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var contract = await _context.Contracts.FindAsync(id);
+
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(contract);
         }
 
         // POST: /api/contracts
-        [HttpPost]
-        public void AddContract([FromBody] Contract contract)
+        //[HttpPost]
+        [ODataRoute]
+        public async Task<IActionResult> Post([FromBody] Contract contract)
         {
-            contracts.Add(contract);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _context.Contracts.Add(contract);
+
+            await _context.SaveChangesAsync();
+
+            return Created(contract.Id.ToString(), contract);
         }
 
-        // PUT: /api/contracts/4
-        [HttpPut("{id}")]
-        public void EditContract(int id, [FromBody] Contract contract)
+        // PATCH: /api/contracts/4
+        // [HttpPut("{id}")]
+        [ODataRoute("({id})")]
+        public async Task<IActionResult> Patch([FromODataUri] int id, [FromBody] Delta<Contract> updatedContract)
         {
-            var idx = contracts.FindIndex(p => p.Id == id);
-            if (idx >= 0)
-                contracts[idx] = contract;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var contract = await _context.Contracts.FindAsync(id);
+
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
+            updatedContract.Patch(contract);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }catch(DbUpdateConcurrencyException ex)
+            {
+                throw ex;
+            }
+
+            return Updated(contract);
         }
 
         // DELETE: /api/contract/4
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // [HttpDelete("{id}")]
+        [ODataRoute("({id})")]
+        public async Task<IActionResult> Delete([FromODataUri] int id)
         {
-            var idx = contracts.FindIndex(s => s.Id == id);
-            if (idx >= 0)
-                contracts.RemoveAt(idx);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var contract = await _context.Contracts.FindAsync(id);
+            if (contract == null)
+            {
+                return NotFound(contract);
+            }
+
+            _context.Contracts.Remove(contract);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

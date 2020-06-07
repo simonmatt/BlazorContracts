@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="blazored.sessionstorage" Version="1.0.12" />
     <PackageReference Include="IdentityModel" Version="4.3.0" />
     <PackageReference Include="identitymodel.aspnetcore" Version="1.0.0" />
     <PackageReference Include="system.text.json" Version="4.7.2" />

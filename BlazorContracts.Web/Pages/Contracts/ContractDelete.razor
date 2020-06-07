@@ -1,0 +1,49 @@
+﻿@page "/contract/{Id:int}/delete"
+
+@using BlazorContracts.Shared.Models
+
+@inject BlazorContracts.Web.Services.ApiService apiService
+
+@inject NavigationManager NavManager
+
+<h3>Are you sure you want to delete this?</h3>
+
+@if (contract == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-4" style="background-color:lightgrey;padding:4px;">
+            <h4>@contract.Name</h4>
+            <h4>@contract.PhoneNumber</h4>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:1rem;">
+        <div class="col-12">
+            <button @onclick="OnDeleteButtonClick" class="btn btn-danger">Delete</button>
+            <a href="/contract/@contract.Id">Return to Contract</a>
+        </div>
+    </div>
+}
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private Contract contract;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contract = await apiService.GetContractByIdAsync(Id);
+    }
+
+    private async Task OnDeleteButtonClick()
+    {
+        await apiService.DeleteContractByIdAsync(Id);
+        NavManager.NavigateTo("/");
+    }
+}

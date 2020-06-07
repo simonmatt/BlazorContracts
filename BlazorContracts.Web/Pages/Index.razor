@@ -1,7 +1,9 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using BlazorContracts.Web.Pages.Contracts
 
-Welcome to your new app.
+<h2>Your Contracts</h2>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<ContractListParent>
+    <ContractList />
+</ContractListParent>

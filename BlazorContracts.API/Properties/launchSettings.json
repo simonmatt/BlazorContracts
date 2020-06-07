@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:5001"
+      "applicationUrl": "http://localhost:5101"
     }
   },
   "profiles": {
@@ -17,9 +17,8 @@
     },
     "BlazorContracts.API": {
       "commandName": "Project",
-      "launchBrowser": true,
       "launchUrl": "api/contracts",
-      "applicationUrl": "http://localhost:5001",
+      "applicationUrl": "http://localhost:5101",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

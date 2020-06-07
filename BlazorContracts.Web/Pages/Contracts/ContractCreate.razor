@@ -1,0 +1,60 @@
+﻿@page "/contract/create"
+
+@inject BlazorContracts.Web.Services.ApiService apiService
+
+@using System.Text.Json
+
+@using BlazorContracts.Shared.Models
+
+@inject NavigationManager navManager
+
+<h3>New Contract</h3>
+<div style="max-width:400px;">
+    <EditForm Model="@contract" OnValidSubmit="@PostContract">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group row">
+            <label for="contractName" class="col-sm-6 col-form-label">Name:</label>
+            <input id="contractName" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                   @bind="contract.Name" />
+        </div>
+        <div class="form-group row">
+            <label for="contractPhone" class="col-sm-6 col-form-label">Phone Number:</label>
+            <input id="contractPhone" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                   @bind="contract.PhoneNumber" />
+        </div>
+        <button class="btn btn-primary" type="submit" disabled="@isSuccess">Submit</button>
+        <div class="alert @(isSuccess?"alert-success":"alert-danger")" style="margin-top:1rem;" role="alert"
+            hidden="@(message=="")">
+            @message
+        </div>
+    </EditForm>
+</div>
+
+@code{
+    private Contract contract = new Contract();
+
+    private bool isSuccess = false;
+
+    private string message = "";
+
+    public async Task PostContract()
+    {
+        var response = await apiService.CreateContractAsync(contract);
+        if (response.IsSuccessStatusCode)
+        {
+            isSuccess = true;
+            message = $"Success {response.Headers.Location}";
+            await Task.Run(() =>
+            {
+                Task.Delay(3000);
+                navManager.NavigateTo("/");
+            });
+        }
+        else
+        {
+            message = $"Error: {response.StatusCode.ToString()}. Please retry.";
+        }
+        this.StateHasChanged();
+    }
+}

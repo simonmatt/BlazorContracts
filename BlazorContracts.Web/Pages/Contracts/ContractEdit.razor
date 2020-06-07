@@ -1,0 +1,75 @@
+﻿@page "/contract/{Id:int}/edit"
+
+@inject BlazorContracts.Web.Services.ApiService apiService
+
+@using BlazorContracts.Shared.Models
+
+@using System.Text.Json
+
+@inject NavigationManager navManager
+
+<h3>Edit Contract</h3>
+
+@if (contract == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-8 text-right">
+            <a href="/contract/@contract.Id/delete">delete</a>
+        </div>
+    </div>
+    <div style="max-width: 400px;">
+        <EditForm Model="@contract" OnValidSubmit="@UpdateContract">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group row">
+                <label for="contractName" class="col-sm-6 col-form-label">Name:</label>
+                <input id="contractName" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                       @bind="contract.Name" />
+            </div>
+            <div class="form-group row">
+                <label for="contractPhone" class="col-sm-6 col-form-label">Phone Number:</label>
+                <input id="contractPhone" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                       @bind="contract.PhoneNumber" />
+            </div>
+            <button class="btn btn-primary" type="submit" disabled="@isSuccess">Submit</button>
+            <div class="alert @(isSuccess?"alert-success":"alert-danger")" style="margin-top:1rem" role="alert"
+                 hidden="@(message=="")">@message</div>
+            </EditForm>
+        </div>
+    }
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private bool isSuccess = false;
+    private string message = "";
+
+    private Contract contract;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contract = await apiService.GetContractByIdAsync(Id);
+    }
+
+    private async Task UpdateContract()
+    {
+        var response = await apiService.EditContractAsync(Id, contract);
+
+        if (response.IsSuccessStatusCode)
+        {
+            isSuccess = true;
+            message = $"Success: {response.Headers.Location}";
+        }
+        else
+        {
+            message = $"Error: {response.StatusCode.ToString()}. Please retry.";
+        }
+
+        this.StateHasChanged();
+    }
+}
