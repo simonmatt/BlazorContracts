@@ -1,0 +1,41 @@
+﻿@page "/contracts"
+
+@inject BlazorContracts.Web.Services.ApiService apiService
+@using BlazorContracts.Shared.Models
+
+<h3>Contracts</h3>
+@if (contracts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contract in contracts)
+            {
+                <tr>
+                    <td>@contract.Id</td>
+                    <td>@contract.Name</td>
+                    <td>@contract.PhoneNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code{
+    List<Contract> contracts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contracts = await apiService.GetContractsAsync();
+    }
+}
