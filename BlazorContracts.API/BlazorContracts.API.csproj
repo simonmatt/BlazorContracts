@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="identityserver4.accesstokenvalidation" Version="3.0.1" />
-    <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.4" />
+    <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.18" />
     <PackageReference Include="microsoft.aspnetcore.odata" Version="7.4.1" />
     <PackageReference Include="microsoft.entityframeworkcore.inmemory" Version="3.1.4" />
     <PackageReference Include="microsoft.entityframeworkcore.sqlserver" Version="3.1.4" />
